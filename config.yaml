@@ -1,0 +1,122 @@
+data:
+  data_dir: .
+  handle_missing: drop
+  max_sequence_length: 1000
+  max_smiles_length: 500
+  min_sequence_length: 10
+  min_smiles_length: 5
+  missing_threshold: 0.5
+  outlier_method: iqr
+  outlier_threshold: 1.5
+  random_state: 42
+  remove_duplicates: true
+  test_file: test.csv
+  test_size: 0.2
+  train_file: train.csv
+  val_size: 0.1
+evaluation:
+  diversity_metrics:
+  - tanimoto_diversity
+  - scaffold_diversity
+  - descriptor_diversity
+  - cluster_diversity
+  figure_size: [12, 8]
+  generate_html_report: true
+  include_interactive_plots: true
+  plot_dpi: 300
+  plot_format: png
+  validity_metrics:
+  - validity_rate
+  - lipinski_compliance
+  - qed_score
+  - sa_score
+  - pains_alerts
+features:
+  fingerprint_size: 2048
+  fingerprint_types:
+  - morgan
+  - rdkit
+  - maccs
+  fusion_dim: 512
+  fusion_method: concatenation
+  molecular_descriptors:
+  - MolWt
+  - LogP
+  - NumHDonors
+  - NumHAcceptors
+  - TPSA
+  - NumRotatableBonds
+  - NumAromaticRings
+  sequence_encoding_methods:
+  - one_hot
+  - amino_acid_properties
+  - kmer
+  - statistical
+  sequence_normalize: true
+generation:
+  diversity_threshold: 0.7
+  guidance_scale: 7.5
+  linker_types:
+  - peptide
+  - peg
+  - alkyl
+  - aromatic
+  max_attempts: 10000
+  max_linker_length: 20
+  num_samples: 1000
+  optimization_steps: 100
+  target_properties:
+    logp: [-2, 5]
+    molecular_weight: [200, 800]
+    qed: [0.5, 1.0]
+    sa_score: [1, 4]
+log_dir: logs
+log_format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+log_level: INFO
+model:
+  beta_end: 0.02
+  beta_start: 0.0001
+  dar_dropout: 0.2
+  dar_hidden_dims: [512, 256, 128]
+  dar_model_type: neural_network
+  diffusion_timesteps: 1000
+  embedding_dim: 512
+  hidden_dim: 256
+  noise_schedule: linear
+  policy_hidden_dims: [256, 256]
+  rl_batch_size: 256
+  rl_buffer_size: 100000
+  rl_gamma: 0.99
+  rl_lr: 0.0003
+  rl_tau: 0.005
+  rl_update_frequency: 4
+  unet_channels: 3
+  unet_dim: 128
+  unet_dim_mults: [1, 2, 4, 8]
+  unet_resnet_block_groups: 8
+  value_hidden_dims: [256, 256]
+model_dir: models
+output_dir: outputs
+project_name: ADC生成挑战赛
+seed: 42
+training:
+  batch_size: 32
+  checkpoint_frequency: 10
+  dar_epochs: 50
+  dar_lr: 0.001
+  device: cuda
+  diffusion_epochs: 200
+  diffusion_lr: 0.0001
+  early_stopping: true
+  learning_rate: 0.0001
+  min_delta: 1.0e-06
+  num_epochs: 100
+  optimizer: adam
+  patience: 10
+  rl_episodes: 1000
+  rl_max_steps: 100
+  save_checkpoints: true
+  scheduler: cosine
+  validation_frequency: 5
+  weight_decay: 1.0e-05
+version: 1.0.0
