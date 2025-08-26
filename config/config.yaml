@@ -1,0 +1,157 @@
+# 基于扩散模型和强化学习的ADC生成挑战赛 - 主配置文件
+
+# 项目基本信息
+project:
+  name: "ADC生成挑战赛"
+  version: "1.0.0"
+  description: "基于扩散模型和强化学习的抗体药物偶联物生成系统"
+  author: "AI Developer"
+
+# 数据配置
+data:
+  train_file: "train.csv"
+  test_file: "test.csv"
+  data_dir: "./"
+  output_dir: "./results"
+  log_dir: "./logs"
+  
+  # 数据字段配置
+  columns:
+    index: "index"
+    antibody_light: "Antibody Light Chain Sequence"
+    antibody_heavy: "Antibody Heavy Chain Sequence"
+    antigen: "Antigen Sequence"
+    payload: "Payload Isosmiles"
+    linker: "Linker Isosmiles"
+    dar: "DAR"
+    labels: ["C1", "C2", "C3", "C4"]
+
+# 特征工程配置
+features:
+  # 序列特征
+  sequence:
+    max_length: 1000
+    encoding_method: "one_hot"  # one_hot, embedding, transformer
+    amino_acid_properties: true
+    
+  # 分子特征
+  molecule:
+    fingerprint_type: "morgan"  # morgan, rdkit, maccs
+    fingerprint_bits: 2048
+    descriptors: ["molecular_weight", "logp", "tpsa", "hbd", "hba"]
+    
+  # 特征融合
+  fusion:
+    method: "concatenate"  # concatenate, attention, cross_modal
+    normalize: true
+
+# 扩散模型配置
+diffusion_model:
+  # 模型架构
+  architecture:
+    model_type: "unet"
+    input_dim: 512
+    hidden_dims: [256, 512, 1024, 512, 256]
+    output_dim: 256
+    attention_heads: 8
+    
+  # 训练参数
+  training:
+    batch_size: 32
+    learning_rate: 1e-4
+    num_epochs: 100
+    warmup_steps: 1000
+    
+  # 扩散过程
+  diffusion:
+    num_timesteps: 1000
+    beta_schedule: "cosine"  # linear, cosine
+    beta_start: 1e-4
+    beta_end: 0.02
+
+# 强化学习配置
+reinforcement_learning:
+  # 环境配置
+  environment:
+    action_space_size: 100
+    state_dim: 512
+    reward_components:
+      dar_fitness: 0.3
+      efficacy_toxicity: 0.4
+      diversity: 0.2
+      chemical_validity: 0.1
+      
+  # 智能体配置
+  agent:
+    algorithm: "PPO"  # PPO, A2C, SAC
+    policy_network:
+      hidden_dims: [256, 256]
+      activation: "relu"
+    value_network:
+      hidden_dims: [256, 256]
+      activation: "relu"
+      
+  # 训练参数
+  training:
+    total_timesteps: 100000
+    learning_rate: 3e-4
+    batch_size: 64
+    n_steps: 2048
+    gamma: 0.99
+    gae_lambda: 0.95
+
+# 分子生成配置
+generation:
+  # 生成参数
+  num_molecules: 500
+  sampling_method: "ddpm"  # ddpm, ddim
+  guidance_scale: 1.0
+  
+  # 筛选参数
+  filtering:
+    dar_range: [2.0, 8.0]
+    molecular_weight_range: [200, 1000]
+    logp_range: [-2, 5]
+    
+  # 优化参数
+  optimization:
+    max_iterations: 1000
+    convergence_threshold: 1e-6
+
+# 评估配置
+evaluation:
+  # 多样性评估
+  diversity:
+    similarity_metric: "tanimoto"
+    fingerprint_type: "morgan"
+    threshold: 0.7
+    
+  # 有效性评估
+  effectiveness:
+    efficacy_threshold: 0.5
+    toxicity_threshold: 0.3
+    
+  # 预测评估
+  prediction:
+    cross_validation_folds: 5
+    test_split: 0.2
+    metrics: ["accuracy", "precision", "recall", "f1"]
+
+# 模型保存和加载
+model:
+  save_dir: "./results/models"
+  checkpoint_interval: 10
+  best_model_metric: "val_loss"
+  
+# 日志配置
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "./logs/adc_generation.log"
+  
+# 计算资源配置
+compute:
+  device: "auto"  # auto, cpu, cuda
+  num_workers: 4
+  pin_memory: true
+  mixed_precision: true
